@@ -1,4 +1,4 @@
-Make sure you have the latest version of Python installed NowS.
+Make sure you have the latest version of Python installed NowS.mike
 
 ```bash
 git clone <repo-url>
