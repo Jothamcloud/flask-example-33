@@ -38,6 +38,19 @@ async function deployContainer(owner, repo, prNumber) {
   });
 }
 
+// Helper function to clean up container
+async function cleanupContainer(owner, repo, prNumber) {
+  return new Promise((resolve, reject) => {
+    exec(`./cleanup.sh ${repo} ${prNumber}`, (error, stdout, stderr) => {
+      if (error) {
+        reject(`Error: ${stderr}`);
+      } else {
+        resolve(stdout.trim());
+      }
+    });
+  });
+}
+
 // Handle pull request opened event
 async function handlePullRequestOpened({ octokit, payload }) {
   console.log(`Received a pull request event for #${payload.pull_request.number}`);
@@ -63,6 +76,10 @@ async function handlePullRequestClosed({ octokit, payload }) {
   console.log(`Received a pull request closed event for #${payload.pull_request.number}`);
 
   try {
+    // Clean up the container
+    await cleanupContainer(payload.repository.name, payload.pull_request.number);
+
+    // Post a comment about the PR closure
     await octokit.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
       owner: payload.repository.owner.login,
       repo: payload.repository.name,
