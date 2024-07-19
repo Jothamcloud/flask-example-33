@@ -3,7 +3,6 @@ import { App } from "octokit";
 import { createNodeMiddleware } from "@octokit/webhooks";
 import fs from "fs";
 import http from "http";
-import { exec } from "child_process";
 
 dotenv.config();
 
@@ -11,12 +10,13 @@ const appId = process.env.APP_ID;
 const webhookSecret = process.env.WEBHOOK_SECRET;
 const privateKeyPath = process.env.PRIVATE_KEY_PATH;
 const privateKey = fs.readFileSync(privateKeyPath, "utf8");
+const projectName = process.env.PROJECT_NAME; // Your Vercel project name
 
 const app = new App({
   appId: appId,
   privateKey: privateKey,
   webhooks: {
-    secret: webhookSecret
+    secret: webhookSecret,
   },
 });
 
@@ -25,52 +25,18 @@ const welcomeMessage = "Thanks for opening a new PR! Please follow our contribut
 const deploymentMessage = (url) => `Deployment started for PR! Access it at ${url}`;
 const closeMessage = "This PR has been closed without merging.";
 
-// Helper function to deploy container
-async function deployContainer(owner, repo, prNumber) {
-  return new Promise((resolve, reject) => {
-    const containerName = `pr-${prNumber}-${repo}`;
-    const buildCommand = `docker build -t ${containerName} .`;
-    const runCommand = `docker run -d -p 5000:5000 --name ${containerName} ${containerName}`;
-
-    exec(`${buildCommand} && ${runCommand}`, (error, stdout, stderr) => {
-      if (error) {
-        reject(`Error: ${stderr}`);
-      } else {
-        const url = `http://localhost:5000`; // Local deployment URL
-        resolve(url);
-      }
-    });
-  });
-}
-
-// Helper function to clean up container
-async function cleanupContainer(owner, repo, prNumber) {
-  return new Promise((resolve, reject) => {
-    const containerName = `pr-${prNumber}-${repo}`;
-    exec(`docker ps -aq -f name=${containerName}`, (error, stdout, stderr) => {
-      if (error) {
-        reject(`Error: ${stderr}`);
-      } else if (!stdout.trim()) {
-        resolve(`No such container: ${containerName}`);
-      } else {
-        exec(`docker stop ${containerName} && docker rm ${containerName}`, (stopError, stopStdout, stopStderr) => {
-          if (stopError) {
-            reject(`Error: ${stopStderr}`);
-          } else {
-            resolve(`Cleaned up ${containerName}`);
-          }
-        });
-      }
-    });
-  });
-}
+// Generate Vercel deployment URL
+const getVercelDeploymentUrl = (branchName) => {
+  return `https://${projectName}-${branchName.replace(/\//g, '-')}.vercel.app`;
+};
 
 // Handle pull request opened event
 async function handlePullRequestOpened({ octokit, payload }) {
   console.log(`Received a pull request event for #${payload.pull_request.number}`);
 
   try {
-    const url = await deployContainer(payload.repository.owner.login, payload.repository.name, payload.pull_request.number);
+    const branchName = payload.pull_request.head.ref;
+    const url = getVercelDeploymentUrl(branchName);
     await octokit.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
       owner: payload.repository.owner.login,
       repo: payload.repository.name,
@@ -93,7 +59,6 @@ async function handlePullRequestClosed({ octokit, payload }) {
   console.log(`Received a pull request closed event for #${payload.pull_request.number}`);
 
   try {
-    await cleanupContainer(payload.repository.owner.login, payload.repository.name, payload.pull_request.number);
     await octokit.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
       owner: payload.repository.owner.login,
       repo: payload.repository.name,
