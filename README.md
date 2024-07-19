@@ -1,4 +1,4 @@
-Make sure you have the latest version of Python installed NowS.mike
+Make sure you have the latest version of Python installed NowS.mike emma
 
 ```bash
 git clone <repo-url>
