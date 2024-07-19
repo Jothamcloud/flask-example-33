@@ -1,7 +1,3 @@
-# Flask Web App Tutorial
-
-## Setup & Installation noww
-
 Make sure you have the latest version of Python installed.
 
 ```bash
