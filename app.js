@@ -32,7 +32,7 @@ async function deployContainer(owner, repo, prNumber) {
       if (error) {
         reject(`Error: ${stderr}`);
       } else {
-        resolve(stdout.trim());
+        resolve(stdout.trim()); // Ensure only the URL is captured
       }
     });
   });
