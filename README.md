@@ -1,4 +1,4 @@
-Make sure you have the latest version of Python installed hng is hard sir
+Make sure you have the latest version of Python installed hng is very hard sir
 
 ```bash
 git clone <repo-url>
