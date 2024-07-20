@@ -1,4 +1,4 @@
-Make sure you have the latest version of Python installed Properly .....!!!!!!!!!!!!!!!
+Make sure you have the latest version of Python installed Properly .....!!!!!!!!!!!!!!!!!!!!
 
 ```bash
 git clone <repo-url>
