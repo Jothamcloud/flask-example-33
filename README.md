@@ -1,4 +1,4 @@
-Make sure you have the latest version of Python installed Properly In the morning okay Now
+Make sure you have the latest version of Python installed Properly In the morning okay Now now
 
 ```bash
 git clone <repo-url>
