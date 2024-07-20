@@ -21,27 +21,14 @@ const app = new App({
 });
 
 // Define messages
-const welcomeMessage = "Hello Engineer,Thanks for opening a new PR. Your deployment process has started and it is currently in progress.";
-const deploymentMessage = (url) => `Congrats on your successful deployment. You can Access your deployment at ${url}`;
+const welcomeMessage = "Thanks for opening a new PR! Please follow our contributing guidelines to make your PR easier to review.";
+const deploymentMessage = (url) => `Deployment started for PR! Access it at ${url}`;
 const closeMessage = "This PR has been closed without merging.";
 
 // Helper function to deploy container and get URL
 async function deployContainer(owner, repo, prNumber) {
   return new Promise((resolve, reject) => {
     exec(`./deploy.sh ${repo} ${prNumber}`, (error, stdout, stderr) => {
-      if (error) {
-        reject(`Error: ${stderr}`);
-      } else {
-        resolve(stdout.trim()); // Ensure only the URL is captured
-      }
-    });
-  });
-}
-
-// Helper function to clean up container
-async function cleanupContainer(owner, repo, prNumber) {
-  return new Promise((resolve, reject) => {
-    exec(`./cleanup.sh ${repo} ${prNumber}`, (error, stdout, stderr) => {
       if (error) {
         reject(`Error: ${stderr}`);
       } else {
@@ -76,10 +63,6 @@ async function handlePullRequestClosed({ octokit, payload }) {
   console.log(`Received a pull request closed event for #${payload.pull_request.number}`);
 
   try {
-    // Clean up the container
-    await cleanupContainer(payload.repository.name, payload.pull_request.number);
-
-    // Post a comment about the PR closure
     await octokit.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
       owner: payload.repository.owner.login,
       repo: payload.repository.name,
