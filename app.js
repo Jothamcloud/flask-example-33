@@ -21,8 +21,8 @@ const app = new App({
 });
 
 // Define messages
-const welcomeMessage = "Thanks for opening a new PR! Please follow our contributing guidelines to make your PR easier to review.";
-const deploymentMessage = (url) => `Deployment started for PR! Access it at ${url}`;
+const welcomeMessage = "Hello Engineer,Thanks for opening a new PR. Your deployment process has started and it is currently in progress.";
+const deploymentMessage = (url) => `Congrats on your successful deployment. You can Access your deployment at ${url}`;
 const closeMessage = "This PR has been closed without merging.";
 
 // Helper function to deploy container and get URL
