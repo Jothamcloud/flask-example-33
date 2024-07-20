@@ -8,7 +8,6 @@ REPO=$1
 PR_NUMBER=$2
 IMAGE_NAME="pr-${PR_NUMBER}-${REPO}"
 CONTAINER_NAME="${IMAGE_NAME}_container"
-LOCALHOST="localhost" # Use localhost for local deployments
 NGROK_API_URL="http://localhost:4040/api/tunnels"
 
 # Function to generate a random port and check if it is available
@@ -27,17 +26,14 @@ PORT=$(generate_available_port)
 
 # Build the Docker image
 echo "Building Docker image..."
-nohup docker build -t ${IMAGE_NAME} . > build.log 2>&1 &
-
-# Wait for the build to complete
-wait
+docker build -t ${IMAGE_NAME} . > build.log 2>&1
 
 # Stop and remove any existing container with the same name
 docker rm -f ${CONTAINER_NAME} || true
 
 # Run the new container
 echo "Running Docker container on port ${PORT}..."
-nohup docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME} > container.log 2>&1 &
+docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME} > container.log 2>&1
 
 # Check if ngrok is already running and terminate it
 if pgrep -x "ngrok" > /dev/null; then
