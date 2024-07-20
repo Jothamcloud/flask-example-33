@@ -3,5 +3,5 @@ website/__pycache__
 website/database.db
 node_modules
 .env
-build.log
-container.log
+*.log
+*.pem
