@@ -45,7 +45,7 @@ echo "Starting ngrok to expose port ${PORT}..."
 ngrok http ${PORT} > /dev/null &
 
 # Wait for ngrok to start and provide a URL
-sleep 5
+sleep 10
 
 # Get the public URL from ngrok
 NGROK_URL=$(curl -s ${NGROK_API_URL} | jq -r '.tunnels[0].public_url')

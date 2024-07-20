@@ -10,6 +10,12 @@ dotenv.config();
 const appId = process.env.APP_ID;
 const webhookSecret = process.env.WEBHOOK_SECRET;
 const privateKeyPath = process.env.PRIVATE_KEY_PATH;
+
+if (!privateKeyPath) {
+  console.error('PRIVATE_KEY_PATH is not set in the environment');     
+  process.exit(1);
+}
+
 const privateKey = fs.readFileSync(privateKeyPath, "utf8");
 
 const app = new App({
@@ -30,8 +36,10 @@ async function deployContainer(owner, repo, prNumber) {
   return new Promise((resolve, reject) => {
     exec(`./deploy.sh ${repo} ${prNumber}`, (error, stdout, stderr) => {
       if (error) {
+        console.error(`Error deploying container: ${stderr}`);
         reject(`Error: ${stderr}`);
       } else {
+        console.log(`Deployment script output: ${stdout}`);
         resolve(stdout.trim());
       }
     });
@@ -54,7 +62,7 @@ async function handlePullRequestOpened({ octokit, payload }) {
       },
     });
   } catch (error) {
-    console.error(`Error! Message: ${error}`);
+    console.error(`Error posting comment: ${error}`);
   }
 }
 
@@ -73,7 +81,7 @@ async function handlePullRequestClosed({ octokit, payload }) {
       },
     });
   } catch (error) {
-    console.error(`Error! Message: ${error}`);
+    console.error(`Error posting close comment: ${error}`);
   }
 }
 
