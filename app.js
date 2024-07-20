@@ -10,23 +10,7 @@ dotenv.config();
 const appId = process.env.APP_ID;
 const webhookSecret = process.env.WEBHOOK_SECRET;
 const privateKeyPath = process.env.PRIVATE_KEY_PATH;
-
-if (!privateKeyPath) {
-  console.error('PRIVATE_KEY_PATH is not set in the environment');
-  process.exit(1);
-}
-
-// Resolve the path to an absolute path
-const absolutePrivateKeyPath = require('path').resolve(privateKeyPath);
-
-// Read the private key file
-let privateKey;
-try {
-  privateKey = fs.readFileSync(absolutePrivateKeyPath, "utf8");
-} catch (err) {
-  console.error('Error reading private key file:', err.message);
-  process.exit(1);
-}
+const privateKey = fs.readFileSync(privateKeyPath, "utf8");
 
 const app = new App({
   appId: appId,
@@ -107,8 +91,8 @@ app.webhooks.onError((error) => {
 });
 
 // Define server details and webhook path
-const port = process.env.PORT || 3000;
-const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+const port = 3000;
+const host = 'localhost';
 const path = "/api/webhook";
 const localWebhookUrl = `http://${host}:${port}${path}`;
 
@@ -116,8 +100,7 @@ const localWebhookUrl = `http://${host}:${port}${path}`;
 const middleware = createNodeMiddleware(app.webhooks, { path });
 
 // Create and start the HTTP server
-http.createServer(middleware).listen(port, host, () => {
+http.createServer(middleware).listen(port, () => {
   console.log(`Server is listening for events at: ${localWebhookUrl}`);
   console.log('Press Ctrl + C to quit.');
 });
-

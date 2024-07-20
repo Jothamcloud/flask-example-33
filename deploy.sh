@@ -8,7 +8,7 @@ REPO=$1
 PR_NUMBER=$2
 IMAGE_NAME="pr-${PR_NUMBER}-${REPO}"
 CONTAINER_NAME="${IMAGE_NAME}_container"
-EC2_IP="3.91.204.214" # Replace with your EC2 instance's public IP address
+LOCALHOST="localhost" # Use localhost for local deployments
 
 # Function to generate a random port and check if it is available
 generate_available_port() {
@@ -39,7 +39,6 @@ echo "Running Docker container on port ${PORT}..."
 nohup docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME} > container.log 2>&1 &
 
 # Get the URL of the deployed service
-DEPLOYMENT_URL="http://${EC2_IP}:${PORT}"
+DEPLOYMENT_URL="http://${LOCALHOST}:${PORT}"
 
 echo ${DEPLOYMENT_URL}
-
