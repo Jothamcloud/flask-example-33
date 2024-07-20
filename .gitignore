@@ -3,3 +3,6 @@ website/__pycache__
 website/database.db
 node_modules
 .env
+*.log
+*.pem
+hng-devops-3.2024-07-19.private-key.pem
