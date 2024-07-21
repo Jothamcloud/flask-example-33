@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import { App } from "octokit";
 import { createNodeMiddleware } from "@octokit/webhooks";
 import fs from "fs";
+import http from "http";  // Add this line to import the http module
 import { exec } from "child_process";
 
 dotenv.config();
@@ -11,7 +12,7 @@ const webhookSecret = process.env.WEBHOOK_SECRET;
 const privateKeyPath = process.env.PRIVATE_KEY_PATH;
 
 if (!privateKeyPath) {
-  console.error('PRIVATE_KEY_PATH is not set in the environment');
+  console.error('PRIVATE_KEY_PATH is not set in the environment');     
   process.exit(1);
 }
 
@@ -26,25 +27,9 @@ const app = new App({
 });
 
 // Define messages
-const welcomeMessage = `
-🎉 **Welcome to your new Pull Request!** 🎉
-
-Thank you for contributing to our project. Your PR is now in the review process.
-Please ensure you've followed our [contributing guidelines](URL_TO_CONTRIBUTING_GUIDELINES) to make the review process smoother.`;
-
-const deploymentMessage = (url) => `
-🚀 **Deployment in Progress!** 🚀
-
-Your PR has triggered a deployment. You can access the deployed application at the following URL:
-🔗 [Deployed Application](${url})
-
-Happy testing!`;
-
-const closeMessage = `
-🛑 **PR Closed** 🛑
-
-This PR has been closed without merging. Thank you for your contribution!
-If you have any questions or need further assistance, feel free to reach out.`;
+const welcomeMessage = "Thanks for opening a new PR! Please follow our contributing guidelines to make your PR easier to review.";
+const deploymentMessage = (url) => `🚀 Deployment started for this PR! You can check it out here: [${url}](${url}) 🌟`;
+const closeMessage = "This PR has been closed without merging. Thanks for your contributions!";
 
 // Helper function to deploy container and get URL
 async function deployContainer(owner, repo, prNumber) {
@@ -55,9 +40,7 @@ async function deployContainer(owner, repo, prNumber) {
         reject(`Error: ${stderr}`);
       } else {
         console.log(`Deployment script output: ${stdout}`);
-        // Capture the URL from the deployment script's output
-        const url = stdout.trim().split('\n').pop();
-        resolve(url);
+        resolve(stdout.trim());
       }
     });
   });
@@ -117,7 +100,7 @@ app.webhooks.onError((error) => {
 
 // Define server details and webhook path
 const port = 3000;
-const host = 'localhost';
+const host = '0.0.0.0';
 const path = "/api/webhook";
 const localWebhookUrl = `http://${host}:${port}${path}`;
 
