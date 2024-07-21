@@ -8,7 +8,7 @@ REPO=$1
 PR_NUMBER=$2
 IMAGE_NAME="pr-${PR_NUMBER}-${REPO}"
 CONTAINER_NAME="${IMAGE_NAME}_container"
-LOCALHOST="localhost" # Use localhost for local deployments
+LOCAL_IP="172.31.205.200"  # Your local machine's IP address
 
 # Function to generate a random port and check if it is available
 generate_available_port() {
@@ -26,19 +26,19 @@ PORT=$(generate_available_port)
 
 # Build the Docker image
 echo "Building Docker image..."
-nohup docker build -t ${IMAGE_NAME} . > build.log 2>&1 &
-
-# Wait for the build to complete
-wait
+docker build -t ${IMAGE_NAME} . > build.log 2>&1
 
 # Stop and remove any existing container with the same name
 docker rm -f ${CONTAINER_NAME} || true
 
 # Run the new container
 echo "Running Docker container on port ${PORT}..."
-nohup docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME} > container.log 2>&1 &
+docker run -d --name ${CONTAINER_NAME} -p ${PORT}:5000 ${IMAGE_NAME} > container.log 2>&1
 
 # Get the URL of the deployed service
-DEPLOYMENT_URL="http://${LOCALHOST}:${PORT}"
+DEPLOYMENT_URL="http://${LOCAL_IP}:${PORT}"
 
+echo "Deployment URL: ${DEPLOYMENT_URL}"
+
+# Print the deployment URL for the bot to capture
 echo ${DEPLOYMENT_URL}
